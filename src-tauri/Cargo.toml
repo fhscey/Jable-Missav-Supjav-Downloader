@@ -1,6 +1,6 @@
 [package]
 name = "avdl"
-version = "0.3.0"
+version = "0.4.0"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
@@ -18,27 +18,41 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["macos-private-api"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-wreq = { version = "6.0.0-rc", features = ["stream", "socks"] }
-wreq-util = "3.0.0-rc"
-url = "2"
-dom_query = "0.27.0"
-regex = "1"
-tokio = { version = "1", features = ["full"] }
+tauri-plugin-log = "2"
+tauri-plugin-fs = "2"
+log = "0.4"
+anyhow = "1.0.104"
+thiserror = "2.0.20"
+sysproxy = "0.3.0"
+bitvec = { version = "1.1.1", features = ["serde"] }
+dashmap = "6.2.1"
+uuid = { version = "1.24.1", features = ["v4", "serde"] }
+tokio = { version = "1.53.1", features = ["full"] }
+tokio-util = "0.7.19"
+async-trait = "0.1"
+url = "2.5"
 aes = "0.8"
 cbc = "0.1"
- phf = { version = "0.14.0", features = ["macros"] }
+cipher = { version = "0.4", features = ["block-padding"] }
+dom_query = "0.27"
+regex = "1.11"
+dirs = "5.0"
+hex = "0.4"
+m3u8-rs = "6.0.1"
+reqwest = { version = "0.13.4", features = ["json", "stream", "cookies"] }
+rusqlite = { version = "0.40.2", features = ["uuid"] }
+parking_lot = "0.12.5"
 rfd = "0.17.2"
-sysinfo = "0.38.4"
-sysproxy = "0.3"
-futures-util = "0.3"
+lru = "0.18.4"
+sysinfo = "0.39.6"
 
 [profile.release]
-panic = "abort"
-codegen-units = 1
-lto = true
-opt-level = "s"
-strip = true
+opt-level = "s"      # 或 "z"：优先针对代码体积进行深度优化，避免激进的代码膨胀内联
+lto = true           # 开启链接时优化 (Link Time Optimization)，跨 crate 剔除死代码和合并重复代码
+codegen-units = 1    # 仅使用 1 个代码生成单元，让 LTO 能够全局最大化消除冗余
+strip = true         # 编译后自动彻底剥离符号表和调试信息（直接省去约 6MB）
+panic = "abort"      # panic 时直接退出，省去大块异常栈展开回溯代码

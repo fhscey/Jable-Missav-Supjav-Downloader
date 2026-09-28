@@ -1,117 +1,131 @@
-# AVDL - Video Downloader
+# AVDL - The Ultimate Desktop Video Browser & Downloader
 
 Language: [简体中文](../README.md) | [繁體中文](README.zh-TW.md) | **English** | [日本語](README.ja.md)
 
-Discord: [Join our Discord community](https://discord.gg/GACc7HhHY)
+Discord: [Join our Discord Community](https://discord.gg/GACc7HhHY)
 
-> **Ultra Lightweight · Maximum Performance** — A high-performance desktop video downloading and browsing tool built with Tauri v2, React, and Rust. Features a featherweight binary (~10 MB) with ultra-low memory footprint. Supports JableTV, MissAV, and SupJav.
-
-![Light Mode](../docs/images/preview01.png)
-
-![Dark Mode](../docs/images/preview02.png)
+> **Ultra-Lightweight · Instant Streaming**  
+> AVDL is a modern, high-performance desktop client crafted for media enthusiasts. Breaking away from tedious web pagination and loading pauses, AVDL gathers multi-source content onto a single fluid, boundless canvas. Experience unprecedented browsing, previews, inline playback, and one-click downloads. Portable builds are only **~10 MB**, launching in milliseconds with minimal system footprint. **Fullscreen usage recommended.**
 
 ---
 
-## Features
+## ✨ Key Features
 
-### Download & File Processing
+### 🌌 Infinite Exploration Canvas
 
-- **M3U8 Segment Download & Decryption**: Supports multi-threaded TS segment concurrent downloading, AES-128-CBC automatic decryption, and breakpoint resume.
-- **Streamtape Streaming Download**: Decrypts Streamtape obfuscated scripts and uses streaming incremental writes to disk.
+- **No More Traditional Pagination**: Say goodbye to rigid grids and pagination buttons. All videos are rendered seamlessly across an expansive, continuous canvas.
+- **Fluid Zoom & Pan**: Freely zoom in and out without steps using the mouse wheel, and drag-to-pan like navigating a panoramic map.
+- **Dynamic Viewport Culling**: Ultra-high frame rate transitions ensure buttery-smooth responsiveness regardless of how many items are loaded.
 
-### Site Adaptation & Anti-Crawling
+![Preview](./img/preview.webp)
 
-- **Cloudflare Verification & Status Perception**: Built-in verification window to obtain and manage Cloudflare credentials, automatically clearing invalid credentials and prompting re-verification.
-- **Smart Proxy Perception & Adaptation**: Automatically detects and applies OS-level HTTP / SOCKS5 proxy configurations (seamlessly compatible with Clash, Shadowsocks, and system proxy tools).
-- **MissAV Mirror Auto-Switching**: Automatically detects connection failures on the primary domain and switches to available mirror domains.
-- **SupJav Multi-Source Processing**: Supports detection and automatic failover across multiple servers (`TV` / `FST` / `VOE` / `ST`); automatically strips disguised PNG image header data from segments.
-- **Trailer Auto-Filtering**: Automatically skips short preview videos under 600 seconds and switches to full-length video sources.
+### 🎬 Instant Online Streaming (Built-in High-Speed Player)
 
-### Interface & Interaction
+- **No Waiting for Downloads**: Forget the hassle of waiting for a file to download before previewing. Click any card to launch immediate, immersive streaming.
+- **Full Player Capabilities**: Adaptive quality switching, instant scrubbing, full-screen viewing, and an immersive cinema dark mode.
 
-- **Ultra Lightweight & Low Footprint**: Executable package is only **~10 MB+**, consuming over **80% less memory** than Electron apps with millisecond startup speeds.
-- **Responsive Grid Layout**: Automatically adjusts column count based on window size to prevent cover image stretching on large screens and text compression on small screens.
-- **Card Hover Preview**: Loads video preview clips when hovering over cards.
-- **Batch Task Control & Dual-Section Management**: Provides a 2-row compact layout for the download queue with hover tooltips, supporting select-all, multi-select, and batch start, pause, cancel, and one-click history clearing.
-- **Flat Design & Multi-Theme Support**: Modern flat design aesthetics, offering built-in dark and light modes with seamless one-click switching.
-- **Disk Storage Analytics**: Displays the total capacity, remaining available space, and download file usage ratio of the target drive.
-- **Multi-Language Support**: Supports Traditional Chinese, Simplified Chinese, English, and Japanese interfaces, as well as multi-language video titles.
+### 🔍 Deep Metadata & Contextual Detail Popovers
 
----
+- **Quick Inspection on Right-Click**: Right-click any card to open a contextual inspector popover.
+- **Comprehensive Metadata**: Instant access to video IDs, performers, category tags, and high-resolution posters.
 
-## Tech Stack
+### 📥 High-Speed Resumable Download Engine
 
-- **Desktop Framework**: Tauri v2
-- **Frontend Framework**: React 19, TypeScript, Vite
-- **UI & Styling**: Tailwind CSS v4, shadcn/ui, Lucide React
-- **State Management**: Zustand
-- **Backend**: Rust (2021)
-- **Networking & Decryption**: `reqwest` / `wreq`, `scraper`, `aes` / `cbc`
-- **Video Merging**: FFmpeg (requires `ffmpeg` in system PATH)
+- **One-Click Enqueue**: Hover over a card and click the top-left download icon to queue the task instantly.
+- **Resilient Resumption**: Multi-task high-speed parallel downloads with automatic segment tracking. If your network disconnects or the app restarts, download progress is preserved—never redownload from scratch.
+
+### 🌐 Multi-Site Aggregation & Smart Proxy Routing
+
+- **Seamless Multi-Source Switching**: Switch between supported content providers (such as JableTV, MissAV, SupJav) with one click.
+- **Comprehensive Filters & Sorting**: Explore categories, ranking charts, recent releases, and highest popularity alongside instant keyword search.
+- **System Proxy Awareness**: Automatically discovers and routes traffic through system proxies (Clash Verge, etc.) with custom endpoint configuration support for reliable cross-regional access.
 
 ---
 
-## Build & Running
+## 🖱️ Interaction & Shortcut Guide
 
-### Requirements
+Fully mouse and trackpad controllable: Middle-click drag to pan, right-click for details, left-click to stream.
 
-- Node.js (v18+)
-- Rust (1.75+)
-- FFmpeg
-
-### Development & Packaging
-
-1. **Install Dependencies**
-
-   ```bash
-   npm install
-   ```
-
-2. **Start Development Server**
-
-   ```bash
-   npm run tauri dev
-   ```
-
-3. **Build Executable**
-
-   ```bash
-   npm run tauri build
-   ```
+| Action | Control Method | Description |
+| :--- | :--- | :--- |
+| **Pan Canvas** | Hold Middle Mouse Button & Drag / Two-Finger Trackpad Swipe | Freely move the viewport across the entire canvas |
+| **Zoom Canvas** | (`Cmd`+Wheel, `Ctrl`+Wheel) / Top Zoom Bar / `+` `-` Keys / Trackpad Pinch | Zoom in for cover details, zoom out for a bird's-eye overview |
+| **Reset View** | Top Zoom Bar Center Button / Press `0` Key | Quickly recenter the camera viewport |
+| **Online Playback** | Left-Click Video Card | Launch built-in streaming player directly |
+| **View Details** | Right-Click Video Card | Open detailed popover (ID, cast, tags, and HD covers) |
+| **Dynamic Preview** | Hover Mouse over Video Card | Automatically stream a muted short preview |
+| **Search Videos** | Press `/` to search videos, press `Esc` to exit | Searches within the currently active site |
+| **Search Tags** | Press `Cmd + k` or `Ctrl + k` in Navigation Drawer, press `Esc` to exit | Quickly filter and locate tags/categories |
+| **Quick Download** | Click card top-left download button or add from details | Added tasks start paused; activate via bottom Download Manager |
+| **Disconnect** | `Option+z` or `Alt+z` / Bottom-Left Disconnect Button | Instantly disconnect from site and display splash image, freeing your busy right hand |
 
 ---
 
-## Which Version Should I Download?
+## 📦 Which Package Should I Download?
 
-Please select the appropriate Release installer or portable package based on your operating system and architecture:
+AVDL provides both **Installer Packages** and **Portable Binaries** across all major platforms (6 download options in total):
 
-| Operating System | Architecture | File Format / Example Filename | Description & Usage |
+> **Important**: `ffmpeg` must be installed on your system and available in your `PATH` environment variable. Download it from the official ffmpeg website or GitHub release page.
+
+| OS | Architecture | File Format / Artifact | Description & Recommendation |
 | :--- | :--- | :--- | :--- |
-| **Windows** | x64 (64-bit) | `avdl_*_x64-setup.exe` | **Installer**: Double-click to run the setup wizard to complete installation. |
-| | | `AVDL_*_windows_x64.exe` | **Portable Binary**: Standalone executable, double-click directly to run. |
-| **macOS** | Apple Silicon (arm64, M-series) | `avdl_*.dmg` | **Disk Image**: Double-click DMG and drag icon to Applications folder. |
-| | | `AVDL_*_mac_arm64.zip` | **Portable Archive**: Unzip and move `avdl.app` into Applications folder.<br>(If blocked on first launch, see macOS Notes below) |
-| **Linux** | x64 (64-bit) | `avdl_*.AppImage` | **Standard Package**: Grant execution permission for AppImage to run. |
-| | | `AVDL_*_linux_x64.tar.gz` | **Portable Archive**: Extract the `avdl` executable file and run directly. |
+| **Windows** | x64 (64-bit) | `avdl_*_x64-setup.exe` | **Installer**: Standard installation wizard with desktop shortcut, recommended for most Windows users |
+| | | `AVDL_*_windows_x64.exe` | **Portable**: Standalone executable, run directly without installation (ideal for USB drives) |
+| **macOS** | Apple Silicon (arm64, M-series) | `avdl_*_aarch64.dmg` | **DMG Disk Image**: Double-click to mount and drag into your Applications folder |
+| | | `AVDL_*_mac_arm64.zip` | **Portable Archive**: Extract the standalone executable directly |
+| **Linux** | x64 (64-bit) | `avdl_*_amd64.AppImage` | **AppImage**: Universal across distros, grant executable permissions and run (Ubuntu / Fedora / Arch) |
+| | | `AVDL_*_linux_x64.tar.gz` | **Portable Archive**: Extract the `avdl` standalone binary for advanced users & scripting |
 
-> The filename prefix case matches the actual Release artifacts: lowercase `avdl_` for Tauri-generated installers (NSIS / DMG / AppImage) and uppercase `AVDL_` for CI-generated portable builds.
+> Note: Lowercase prefixes (e.g., `avdl_...`) represent standard installers; uppercase prefixes (e.g., `AVDL_...`) represent portable zero-install binaries.
 
 ---
 
-## macOS Usage Notes & FAQ
+## 🍎 macOS First-Launch Guide
 
-When running the packaged `.app` or binary file, please note that the software is an open-source unsigned application. If you encounter permission blocks prior to first launch, you can execute the following commands in the terminal to remove macOS quarantine restrictions:
+Because this application is an open-source, unsigned release, macOS Gatekeeper may show a warning ("cannot be opened" or "damaged") on the first launch. Run the following command in **Terminal** to bypass the quarantine flag:
 
 ```bash
-# Remove app bundle quarantine
+# For .app installed in the Applications folder:
 xattr -cr /Applications/avdl.app
 
-# Remove single binary file quarantine
+# For standalone portable executable:
 xattr -cr ./avdl
 ```
 
+After running this command, double-click to launch normally.
+
 ---
 
-## Disclaimer
+## 🛠️ Local Development & Build
 
-This project is intended strictly for personal learning and technical research purposes.
+To build AVDL from source:
+
+1. **Prerequisites**:
+   - Install [Bun](https://bun.sh/) (recommended) or Node.js (v18+)
+   - Install [Rust](https://rustup.rs/) (1.75+)
+   - Ensure `ffmpeg` is installed and added to `PATH`
+
+2. **Install Dependencies**:
+
+   ```bash
+   bun install
+   ```
+
+3. **Start Development Server**:
+
+   ```bash
+   bun run tauri dev
+   ```
+
+4. **Production Build**:
+   ```bash
+   bun run tauri build
+   ```
+
+---
+
+## 📜 Disclaimer
+
+1. This project is intended solely for personal study, technical research, and media streaming exploration.
+2. The software does not host, store, or upload any audio/video resources. All content is fetched directly from user-selected public web sources in real time.
+3. Please use this software in compliance with local laws and regulations.

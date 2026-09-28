@@ -22,19 +22,20 @@ jobs:
         include:
           - platform: 'macos-latest'
             target: 'aarch64-apple-darwin'
-            args: '--target aarch64-apple-darwin'
+            args: '--target aarch64-apple-darwin --bundles dmg'
+            binary_name: 'avdl'
           - platform: 'windows-latest'
             target: 'x86_64-pc-windows-msvc'
-            args: ''
-            binary_path: 'src-tauri/target/release/avdl.exe'
+            args: '--bundles nsis'
+            binary_name: 'avdl.exe'
           - platform: 'ubuntu-22.04'
             target: 'x86_64-unknown-linux-gnu'
-            args: ''
-            binary_path: 'src-tauri/target/release/avdl'
+            args: '--bundles appimage'
+            binary_name: 'avdl'
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set Release Tag
         shell: bash
@@ -50,8 +51,11 @@ jobs:
           echo "EFFECTIVE_TAG=$TAG" >> $GITHUB_ENV
           echo "Using release tag: $TAG"
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -67,11 +71,11 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf ffmpeg
 
       - name: Install Frontend Dependencies
-        run: npm install
+        run: bun install
 
       - name: Sync Version from Git Tag
         shell: bash
-        run: node scripts/version.cjs ${{ env.EFFECTIVE_TAG }}
+        run: bun scripts/version.cjs ${{ env.EFFECTIVE_TAG }}
 
       - name: Build and Package with Tauri Action
         uses: tauri-apps/tauri-action@v1
@@ -84,10 +88,9 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
-      # Pull the release notes straight from CHANGELOG.md — no manual editing
-      # on the GitHub release page. The section matching EFFECTIVE_TAG is used
-      # (falling back to the first section, e.g. [Unreleased]).
+      # Pull the release notes straight from CHANGELOG.md — run once on Linux
       - name: Update Release Notes from CHANGELOG.md
+        if: matrix.platform == 'ubuntu-22.04'
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -97,9 +100,6 @@ jobs:
             echo "CHANGELOG.md not found — skipping release notes"
             exit 0
           fi
-          # Write the extracted section straight to a UTF-8 file. Do NOT print
-          # it to stdout: on Windows runners Python's stdout defaults to the
-          # ANSI codepage (cp1252) and chokes on non-ASCII changelog text.
           python3 - "$GITHUB_WORKSPACE/CHANGELOG.md" "$EFFECTIVE_TAG" \
             "$GITHUB_WORKSPACE/release_body.md" <<'PYEOF'
           import re, sys
@@ -107,7 +107,7 @@ jobs:
           version = sys.argv[2].lstrip('v')
           m = re.search(r'(?m)^##\s+\[%s\]' % re.escape(version), text)
           if not m:
-              m = re.search(r'(?m)^##\s', text)  # fallback: first section
+              m = re.search(r'(?m)^##\s', text)
           if not m:
               sys.exit(0)
           start = m.start()
@@ -119,14 +119,7 @@ jobs:
           gh release edit "$EFFECTIVE_TAG" --notes-file "$GITHUB_WORKSPACE/release_body.md"
           echo "Release notes updated for $EFFECTIVE_TAG from CHANGELOG.md"
 
-      # Portable (installer-free) artifacts for all three platforms.
-      #
-      # NOTE: previous versions located binaries with `find ... | head -n 1`.
-      # GitHub Actions runs bash with `-e -o pipefail`, so when `find` matched
-      # more than one file (e.g. the DMG staging copy of the .app bundle) `head`
-      # closed the pipe early, `find` died with SIGPIPE (exit 141) and the whole
-      # step — and job — failed, silently skipping the macOS binary upload.
-      # We now use explicit, per-platform paths and fail with a clear message.
+      # Portable binary artifacts for all three platforms
       - name: Upload Portable Binary
         shell: bash
         env:
@@ -135,59 +128,44 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${EFFECTIVE_TAG}"
-          echo "Packaging portable artifact for ${TAG}"
-          # Make sure the release exists even if this job is the first to finish.
-          gh release view "${TAG}" >/dev/null 2>&1 || gh release create "${TAG}" --title "AVDL ${TAG}" --notes ""
+          echo "Packaging portable artifact for ${TAG} on ${{ matrix.platform }}"
+
+          # Locate compiled binary directly in release directory
+          BIN=""
+          for candidate in \
+            "src-tauri/target/${{ matrix.target }}/release/${{ matrix.binary_name }}" \
+            "src-tauri/target/release/${{ matrix.binary_name }}"; do
+            if [ -f "$candidate" ]; then
+              BIN="$candidate"
+              break
+            fi
+          done
+
+          if [ -z "$BIN" ]; then
+            echo "::error::Binary ${{ matrix.binary_name }} not found. Searching target dir:"
+            find src-tauri/target -type f -name "${{ matrix.binary_name }}" 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "Found binary at $BIN"
 
           case "${{ matrix.platform }}" in
             macos-latest)
-              # After tauri bundles the .dmg it CLEANS the .app out of
-              # bundle/macos/, so the portable zip must be produced from the
-              # dmg itself (hdiutil is preinstalled on macOS runners).
               ZIP_NAME="AVDL_${TAG}_mac_arm64.zip"
-              DMG_PATH=""
-              for candidate in \
-                "$GITHUB_WORKSPACE/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/"*.dmg \
-                "$GITHUB_WORKSPACE/src-tauri/target/release/bundle/dmg/"*.dmg ; do
-                [ -f "$candidate" ] && DMG_PATH="$candidate" && break
-              done
-              if [ -z "$DMG_PATH" ]; then
-                echo "::error::macOS dmg not found. Searching:"
-                find "$GITHUB_WORKSPACE/src-tauri/target" -name "*.dmg" -type f 2>/dev/null | head -5 || true
-                exit 1
-              fi
-              echo "Extracting .app from $DMG_PATH"
-              MOUNT="/tmp/avdl_dmg"
-              rm -rf "$MOUNT" && mkdir -p "$MOUNT"
-              hdiutil attach "$DMG_PATH" -nobrowse -readonly -mountpoint "$MOUNT" >/dev/null
-              APP_PATH=$(find "$MOUNT" -maxdepth 3 -name "*.app" -type d | head -n 1)
-              if [ -z "$APP_PATH" ]; then
-                echo "::error::avdl.app not found inside dmg"
-                hdiutil detach "$MOUNT" >/dev/null 2>&1 || true
-                exit 1
-              fi
-              (cd "$(dirname "$APP_PATH")" && zip -r "${GITHUB_WORKSPACE}/${ZIP_NAME}" "$(basename "$APP_PATH")")
-              hdiutil detach "$MOUNT" >/dev/null 2>&1 || true
-              gh release upload "${TAG}" "${GITHUB_WORKSPACE}/${ZIP_NAME}" --clobber
+              cp "$BIN" ./avdl
+              chmod +x ./avdl
+              zip -j "${ZIP_NAME}" ./avdl
+              gh release upload "${TAG}" "${ZIP_NAME}" --clobber
               ;;
             windows-latest)
-              BIN="${{ matrix.binary_path }}"
               EXE_NAME="AVDL_${TAG}_windows_x64.exe"
-              if [ ! -f "${BIN}" ]; then
-                echo "::error::Windows binary not found at ${BIN}"
-                exit 1
-              fi
-              cp "${BIN}" "${EXE_NAME}"
+              cp "$BIN" "./${EXE_NAME}"
               gh release upload "${TAG}" "./${EXE_NAME}" --clobber
               ;;
             ubuntu-22.04)
-              BIN="${{ matrix.binary_path }}"
               TAR_NAME="AVDL_${TAG}_linux_x64.tar.gz"
-              if [ ! -f "${BIN}" ]; then
-                echo "::error::Linux binary not found at ${BIN}"
-                exit 1
-              fi
-              cp "${BIN}" ./avdl
+              cp "$BIN" ./avdl
+              chmod +x ./avdl
               tar -czvf "${TAR_NAME}" avdl
               gh release upload "${TAG}" "./${TAR_NAME}" --clobber
               ;;

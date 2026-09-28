@@ -1,34 +1,564 @@
-/* Custom utility animations */
-@keyframes fadeIn {
-  from {
+@import 'tailwindcss';
+
+
+@theme {
+  --color-surface-bg: #08090c;
+  --color-surface-card: #0e1015;
+  --color-surface-hud: rgba(9, 10, 14, 0.90);
+  --color-surface-glass: rgba(14, 16, 21, 0.82);
+  --color-surface-control: rgba(24, 24, 27, 0.45);
+  --color-surface-overlay: rgba(0, 0, 0, 0.65);
+  --color-surface-subtle: rgba(255, 255, 255, 0.03);
+  --color-surface-hover: rgba(255, 255, 255, 0.055);
+  --color-surface-focus: rgba(255, 255, 255, 0.08);
+  --color-surface-active: rgba(255, 255, 255, 0.12);
+
+  --color-text-primary: rgba(255, 255, 255, 0.92);
+  --color-text-secondary: rgba(255, 255, 255, 0.65);
+  --color-text-muted: rgba(255, 255, 255, 0.38);
+  --color-text-sub: rgba(255, 255, 255, 0.20);
+  --color-text-inverse: #08090c;
+
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-medium: rgba(255, 255, 255, 0.14);
+  --color-border-active: rgba(255, 255, 255, 0.22);
+
+  --text-2xs: 9.5px;
+  --text-2xs--line-height: 1.3;
+  --text-xs: 11px;
+  --text-xs--line-height: 1.4;
+  --text-sm: 12px;
+  --text-sm--line-height: 1.45;
+  --text-base: 13px;
+  --text-base--line-height: 1.45;
+  --text-md: 14px;
+  --text-md--line-height: 1.4;
+  --text-lg: 15px;
+  --text-lg--line-height: 1.35;
+  --text-xl: 16.5px;
+  --text-xl--line-height: 1.3;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  --shadow-hud: 0 16px 36px -4px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.04);
+  --shadow-glass: 0 20px 40px -15px rgba(0, 0, 0, 0.75);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 15px 45px rgba(0, 0, 0, 0.6);
+
+  --ease-geek: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  position: fixed;
+  inset: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    "Courier New",
+    "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN",
+    "PingFang SC",
+    "Microsoft YaHei UI",
+    monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@layer base {
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+  }
+}
+
+@layer utilities {
+  .text-primary {
+    color: var(--color-text-primary);
+  }
+  .text-secondary {
+    color: var(--color-text-secondary);
+  }
+  .text-muted {
+    color: var(--color-text-muted);
+  }
+  .text-sub {
+    color: var(--color-text-sub);
+  }
+  .text-inverse {
+    color: var(--color-text-inverse);
+  }
+
+  .border-subtle {
+    border-color: var(--color-border-subtle);
+  }
+  .border-default {
+    border-color: var(--color-border-default);
+  }
+  .border-medium {
+    border-color: var(--color-border-medium);
+  }
+  .border-active {
+    border-color: var(--color-border-active);
+  }
+
+  .text-mono-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .glass-surface {
+    background-color: var(--color-surface-glass);
+    border: 1px solid var(--color-border-default);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .dark-depth {
+    background: radial-gradient(circle at 50% 50%, rgba(90, 80, 130, 0.13), transparent 38%), var(--color-surface-bg);
+  }
+
+  .vignette-overlay {
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.38) 100%);
+  }
+}
+
+@layer components {
+  /* 主分区标题（如 TRANSFERS, SITE LIST, DOWNLOAD QUEUE 等） */
+  .text-section-title {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+
+  /* 分组/属性标签（如 CATEGORIES, TAGS, STORAGE, NETWORK 等） */
+  .text-section-label {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  /* 辅助元数据、时间戳、状态文本 */
+  .text-meta {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 极小副元数据（总计标签、编号、角标、文件大小对比） */
+  .text-meta-sub {
+    font-size: var(--text-2xs);
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-text-sub);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 卡片主标题（视频卡片标题等） */
+  .text-card-title {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-text-primary);
+  }
+
+  /* 紧凑正文 */
+  .text-body-sm {
+    font-size: var(--text-sm);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+  }
+
+  /* 键盘快捷键徽标 */
+  .kbd-shortcut {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--color-border-medium);
+    background-color: rgba(255, 255, 255, 0.04);
+    padding: 2px 5px;
+    font-size: var(--text-2xs);
+    color: var(--color-text-muted);
+    line-height: 1;
+    user-select: none;
+  }
+  /* 规范 1：交互控件规范 (Interactive Controls) */
+  .btn-control {
+    position: relative;
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-control);
+    color: var(--color-text-secondary);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn-control:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+    color: var(--color-text-primary);
+  }
+
+  .btn-control:active {
+    transform: scale(0.92);
+  }
+
+  .btn-control:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .input-field {
+    width: 100%;
+    background-color: var(--color-surface-subtle);
+    border: 1px solid var(--color-border-default);
+    color: var(--color-text-primary);
+    outline: none;
+    transition: all 150ms ease;
+  }
+
+  .input-field::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .input-field:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  .input-field:focus {
+    background-color: var(--color-surface-focus);
+    border-color: var(--color-border-medium);
+  }
+
+  .input-control {
+    height: 28px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-subtle);
+    padding: 0 10px;
+    font-size: 11.5px;
+    color: var(--color-text-primary);
+    outline: none;
+    transition: all 150ms ease;
+  }
+
+  .input-control::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .input-control:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  .input-control:focus {
+    border-color: var(--color-border-active);
+    background-color: var(--color-surface-focus);
+  }
+
+  .hud-capsule {
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-hud);
+    box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    user-select: none;
+  }
+
+  .drawer-shell {
+    position: fixed;
+    inset-block: 0;
+    z-index: 190;
+    display: flex;
+    height: 100dvh;
+    flex-direction: column;
+    overflow: hidden;
+    border-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(9, 10, 14, 0.70);
+    padding: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .card-base {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    user-select: none;
+    overflow: hidden;
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-base:hover {
+    z-index: 10;
+    filter: brightness(1.1);
+    border-color: var(--color-border-active);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+  }
+
+  .app-viewport {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    touch-action: none;
+    color: white;
+    background-color: var(--color-surface-bg);
+    background-image: radial-gradient(circle at 50% 50%, rgba(90, 80, 130, 0.13), transparent 38%);
+  }
+
+  .indicator-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background-color: #ffffff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+  }
+
+  .track-rail {
+    position: relative;
+    height: 2px;
+    width: 100%;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-border-default);
+    overflow: hidden;
+  }
+
+  .track-fill {
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+    transition: all 75ms linear;
+  }
+}
+
+/* ==========================================================================
+   全局关键帧动画 (Keyframes)
+   ========================================================================== */
+@keyframes drawer-in-left {
+  from { opacity: 0; transform: translateX(-18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes drawer-out-left {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-18px); }
+}
+
+@keyframes drawer-in-right {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes drawer-out-right {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(18px); }
+}
+
+@keyframes drawer-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes drawer-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes game-save-spin {
+  0% {
     opacity: 0;
-    transform: translateY(4px);
+    transform: perspective(300px) rotateY(0deg) scale(0.75);
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
   }
-  to {
+  20% {
     opacity: 1;
-    transform: translateY(0);
+    transform: perspective(300px) rotateY(45deg) scale(1.05);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+  }
+  72% {
+    opacity: 1;
+    transform: perspective(300px) rotateY(180deg) scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.45));
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(300px) rotateY(180deg) scale(0.85);
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* ==========================================================================
+   Artplayer 极客黑白风主题定制 (Artplayer Geek Monochrome Theme)
+   ========================================================================== */
+.art-video-player {
+  --art-theme: #ffffff !important;
+  --art-font-color: #f4f4f5 !important;
+  --art-progress-height: 4px !important;
+  --art-progress-color: rgba(255, 255, 255, 0.14) !important;
+  --art-loaded-color: rgba(255, 255, 255, 0.30) !important;
+  --art-hover-color: rgba(255, 255, 255, 0.20) !important;
+  --art-indicator-size: 11px !important;
+  --art-tip-background: rgba(12, 12, 16, 0.94) !important;
+  --art-widget-background: rgba(12, 12, 16, 0.94) !important;
 }
 
-/* Custom scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* 进度条轨道与播放指示器 */
+.art-video-player .art-progress .art-control-progress-inner {
+  border-radius: 2px !important;
+  overflow: visible !important;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+.art-video-player .art-progress-played {
+  background: #ffffff !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 2px !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(155, 155, 155, 0.3);
-  border-radius: 9999px;
+.art-video-player .art-progress-loaded {
+  border-radius: 2px !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(155, 155, 155, 0.5);
+.art-video-player .art-progress-indicator {
+  background-color: #ffffff !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9) !important;
+  border-radius: 50% !important;
+}
+
+/* 时间提示框微调（极客等宽数字） */
+.art-video-player .art-progress-tip {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 4px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.02em !important;
+  padding: 3px 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7) !important;
+  color: #ffffff !important;
+}
+
+/* 音量条极客黑白配色 */
+.art-video-player .art-volume-slider {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 2px !important;
+}
+
+.art-video-player .art-volume-played {
+  background: #ffffff !important;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.4) !important;
+  border-radius: 2px !important;
+}
+
+.art-video-player .art-volume-indicator {
+  background-color: #ffffff !important;
+  border: 2px solid #000000 !important;
+}
+
+/* 底栏控制条背景与控件 */
+.art-video-player .art-bottom {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.35) 65%, transparent 100%) !important;
+}
+
+.art-video-player .art-controls .art-control {
+  color: rgba(255, 255, 255, 0.75) !important;
+  transition: color 150ms ease, transform 150ms ease !important;
+}
+
+.art-video-player .art-controls .art-control:hover {
+  color: #ffffff !important;
+}
+
+/* 设置菜单与开关极客黑白风 */
+.art-video-player .art-setting,
+.art-video-player .art-contextmenu {
+  background: rgba(15, 15, 20, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important;
+}
+
+.art-video-player .art-setting-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.art-video-player .art-switch.art-checked {
+  background-color: #ffffff !important;
+}
+
+.art-video-player .art-switch.art-checked .art-switch-handle {
+  background-color: #000000 !important;
+}
+
+/* 加载动画白色系 */
+.art-video-player .art-loading svg path {
+  fill: #ffffff !important;
+}
+
+/* 播放器提示弹层 */
+.art-video-player .art-notice-inner {
+  background-color: rgba(12, 12, 16, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
 }

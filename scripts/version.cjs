@@ -6,17 +6,25 @@
 const fs = require('fs');
 const path = require('path');
 
+const rootDir = path.resolve(__dirname, '..');
+const pkgPath = path.join(rootDir, 'package.json');
+const tauriConfPath = path.join(rootDir, 'src-tauri', 'tauri.conf.json');
+const cargoPath = path.join(rootDir, 'src-tauri', 'Cargo.toml');
+
 const version = process.argv[2];
 if (!version) {
-  console.error('Usage: node scripts/bump.cjs <new_version> (e.g. 0.1.3)');
-  process.exit(1);
+  let currentVersion = 'unknown';
+  if (fs.existsSync(pkgPath)) {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    currentVersion = pkg.version;
+  }
+  console.log(`Current version: ${currentVersion}`);
+  process.exit(0);
 }
 
 const cleanVer = version.replace(/^v/, '');
-const rootDir = path.resolve(__dirname, '..');
 
 // 1. package.json
-const pkgPath = path.join(rootDir, 'package.json');
 if (fs.existsSync(pkgPath)) {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
   pkg.version = cleanVer;
@@ -25,7 +33,6 @@ if (fs.existsSync(pkgPath)) {
 }
 
 // 2. tauri.conf.json
-const tauriConfPath = path.join(rootDir, 'src-tauri', 'tauri.conf.json');
 if (fs.existsSync(tauriConfPath)) {
   const tauriConf = JSON.parse(fs.readFileSync(tauriConfPath, 'utf8'));
   tauriConf.version = cleanVer;
@@ -34,7 +41,6 @@ if (fs.existsSync(tauriConfPath)) {
 }
 
 // 3. Cargo.toml
-const cargoPath = path.join(rootDir, 'src-tauri', 'Cargo.toml');
 if (fs.existsSync(cargoPath)) {
   let cargoContent = fs.readFileSync(cargoPath, 'utf8');
   cargoContent = cargoContent.replace(/^version = ".*?"/m, `version = "${cleanVer}"`);

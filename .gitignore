@@ -27,8 +27,6 @@ Cargo.lock.build
 *.tar.gz
 
 # Local downloaded media files, segment caches & temporary test outputs
-download/
-src-tauri/download/
 temp/
 tmp/
 *.mp4
