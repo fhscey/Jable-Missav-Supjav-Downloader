@@ -208,8 +208,8 @@ function PlayerVideo({
             (artInstance as any).hls = hls;
 
             hls.on(Hls.Events.ERROR, function (_event, data) {
+              console.error('[PlayerModal] HLS error:', data.type, data.details, data);
               if (data.fatal) {
-                console.error('[PlayerModal] HLS error:', data.type, data.details, data);
                 switch (data.type) {
                   case Hls.ErrorTypes.NETWORK_ERROR:
                     console.warn(

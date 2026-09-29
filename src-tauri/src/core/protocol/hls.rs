@@ -335,4 +335,15 @@ mod tests {
         let pt = decrypt_aes128(ct, &key, &iv).unwrap();
         assert_eq!(pt, plaintext);
     }
+
+    #[test]
+    fn test_rewrite_playlist_uris_with_key() {
+        let m3u8_text = "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:10\n#EXT-X-KEY:METHOD=AES-128,URI=\"https://example.com/video.key\",IV=0x1234567890abcdef1234567890abcdef\n#EXTINF:10.0,\nseg0.ts\n#EXT-X-ENDLIST";
+        let res = rewrite_playlist_uris(m3u8_text.as_bytes(), |uri| {
+            format!("http://stream.localhost/proxy?url={}", uri)
+        }).unwrap();
+        println!("REWRITTEN:\n{}", res);
+        assert!(res.contains("http://stream.localhost/proxy?url=https://example.com/video.key"));
+        assert!(res.contains("http://stream.localhost/proxy?url=seg0.ts"));
+    }
 }
