@@ -49,11 +49,11 @@ export const mediaService = {
   },
 
   /**
-   * 构建卡片的本地预览播放地址 (基于 stream:// 协议)
+   * 构建卡片的本地预览播放地址 (Windows 使用 http://stream.localhost, 其他使用 stream://localhost)
    */
   buildPreviewStreamUrl(card: VideoInfo): string | null {
     if (!card.preview_url) return null;
-    return `stream://localhost/proxy?url=${encodeURIComponent(
+    return `${getStreamHost()}/proxy?url=${encodeURIComponent(
       card.preview_url
     )}${card.referer ? `&referer=${encodeURIComponent(card.referer)}` : ''}${
       card.ua ? `&ua=${encodeURIComponent(card.ua)}` : ''
@@ -65,10 +65,18 @@ export const mediaService = {
    */
   buildStreamUrl(url: string, referer?: string, ua?: string): string {
     if (!url) return '';
-    if (url.startsWith('stream://')) return url;
-    let proxyUrl = `stream://localhost/proxy?url=${encodeURIComponent(url)}`;
+    if (url.startsWith('stream://') || url.startsWith('http://stream.localhost')) return url;
+    let proxyUrl = `${getStreamHost()}/proxy?url=${encodeURIComponent(url)}`;
     if (referer) proxyUrl += `&referer=${encodeURIComponent(referer)}`;
     if (ua) proxyUrl += `&ua=${encodeURIComponent(ua)}`;
     return proxyUrl;
   },
 };
+
+function getStreamHost(): string {
+  const isWindows =
+    typeof navigator !== 'undefined' &&
+    (/windows|win32/i.test(navigator.userAgent) ||
+      (navigator as any)?.userAgentData?.platform === 'Windows');
+  return isWindows ? 'http://stream.localhost' : 'stream://localhost';
+}

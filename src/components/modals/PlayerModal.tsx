@@ -6,7 +6,6 @@ import Artplayer from 'artplayer';
 import Hls from 'hls.js';
 import { MediaDetail, VideoInfo } from '../../types';
 import { tauriApi } from '../../api';
-import { logMediaError } from '../../utils/mediaDiagnostics';
 import { useDownloadStore } from '../../store/downloadStore';
 import { useUIStore } from '../../store/uiStore';
 import { useMediaDetail } from '../../hooks/queries';
@@ -188,7 +187,6 @@ function PlayerVideo({
     if (!containerRef.current || !streamUrl) return;
 
     const isHls = streamUrl.includes('.m3u8') || decodeURIComponent(streamUrl).includes('.m3u8');
-    console.info(`[PlayerModal] 启动播放器, 目标流地址:`, streamUrl, `(HLS模式: ${isHls})`);
 
     const art = new Artplayer({
       container: containerRef.current,
@@ -210,22 +208,8 @@ function PlayerVideo({
             (artInstance as any).hls = hls;
 
             hls.on(Hls.Events.ERROR, function (_event, data) {
-              console.warn(`[PlayerModal] [HLS Event Error] type=${data.type}, details=${data.details}, fatal=${data.fatal}`, data);
-              if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                console.error(
-                  `%c[PlayerModal] [HLS Network Error] 网络或协议请求失败: URL=${data.frag?.url || (data as any).url || streamUrl}, HTTP Status=${data.response?.code}.\n` +
-                  `【诊断提示】若 status 为 0 或 undefined 且在 Windows 上，极可能是 WebView2 无法识别 stream:// 协议！`,
-                  'color: #ef4444; font-weight: bold;'
-                );
-              } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-                console.error(
-                  `%c[PlayerModal] [HLS Media Error] 媒体解码异常: ${data.details}.\n` +
-                  `【诊断提示】若分片已下载但解码失败，极可能是 Windows 系统缺少 Media Feature Pack (缺少 H.264/AAC 解码器)！`,
-                  'color: #ef4444; font-weight: bold;'
-                );
-              }
-
               if (data.fatal) {
+                console.error('[PlayerModal] HLS error:', data.type, data.details, data);
                 switch (data.type) {
                   case Hls.ErrorTypes.NETWORK_ERROR:
                     console.warn(
@@ -295,15 +279,8 @@ function PlayerVideo({
       ],
     });
 
-    art.on('ready', () => {
-      console.info(`[PlayerModal] ▶ Artplayer 播放器已就绪: ${title}`);
-    });
-    art.on('error', (err) => {
-      console.error(`[PlayerModal] Artplayer 核心报错:`, err);
-    });
     art.on('video:error', () => {
-      const err = art.video?.error;
-      logMediaError('PlayerModal (Artplayer HTMLVideo)', streamUrl, err);
+      console.error('[PlayerModal] video element error:', art.video?.error, streamUrl);
     });
 
     artRef.current = art;

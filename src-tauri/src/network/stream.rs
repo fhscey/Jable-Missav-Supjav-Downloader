@@ -23,6 +23,12 @@ static PREVIEW_CACHE: LazyLock<Mutex<LruCache<String, CachedMedia>>> = LazyLock:
     Mutex::new(LruCache::new(NonZeroUsize::new(60).unwrap()))
 });
 
+#[cfg(target_os = "windows")]
+pub const STREAM_HOST: &str = "http://stream.localhost";
+
+#[cfg(not(target_os = "windows"))]
+pub const STREAM_HOST: &str = "stream://localhost";
+
 fn should_omit_referer(url: &str) -> bool {
     url.contains("googleusercontent.com") || url.contains("googlevideo.com")
 }
@@ -34,7 +40,7 @@ pub fn build_stream_url(
     is_preview: bool,
 ) -> String {
     let encoded_url = url::form_urlencoded::byte_serialize(url.as_bytes()).collect::<String>();
-    let mut res = format!("stream://localhost/proxy?url={}", encoded_url);
+    let mut res = format!("{}/proxy?url={}", STREAM_HOST, encoded_url);
     if let Some(r) = referer.filter(|s| !s.is_empty()) {
         let enc_ref = url::form_urlencoded::byte_serialize(r.as_bytes()).collect::<String>();
         res.push_str(&format!("&referer={}", enc_ref));
@@ -108,6 +114,16 @@ pub async fn handle_stream_request(
     app: AppHandle,
     request: tauri::http::Request<Vec<u8>>,
 ) -> Result<tauri::http::Response<Vec<u8>>> {
+    if request.method() == tauri::http::Method::OPTIONS {
+        return Ok(tauri::http::Response::builder()
+            .status(tauri::http::StatusCode::NO_CONTENT)
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Headers", "*")
+            .header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+            .header("Access-Control-Max-Age", "86400")
+            .body(Vec::new())?);
+    }
+
     let parsed_uri = Url::parse(&request.uri().to_string().replace("stream://", "http://"))?;
 
     let mut target_url = String::new();
@@ -325,7 +341,7 @@ pub fn rewrite_m3u8_for_streaming(
         let encoded = url::form_urlencoded::byte_serialize(resolved.as_bytes()).collect::<String>();
         let is_sub_m3u8 = hls::is_m3u8(&resolved);
         let seg_param = if !is_sub_m3u8 { "&is_seg=1" } else { "" };
-        format!("stream://localhost/proxy?url={}{}{}", encoded, extra_params, seg_param)
+        format!("{}/proxy?url={}{}{}", STREAM_HOST, encoded, extra_params, seg_param)
     };
 
     hls::rewrite_playlist_uris(content.as_bytes(), to_stream_proxy_url).map_err(|e| anyhow!(e))
