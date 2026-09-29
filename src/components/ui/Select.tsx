@@ -38,8 +38,7 @@ export function Select<T extends string = string>({
     return opt;
   });
 
-  const currentLabel =
-    normalizedOptions.find((opt) => opt.value === value)?.label || value;
+  const currentLabel = normalizedOptions.find((opt) => opt.value === value)?.label || value;
 
   return (
     <div ref={containerRef} className={cn('relative select-none', open && 'z-40', className)}>
@@ -98,5 +97,3 @@ export function Select<T extends string = string>({
     </div>
   );
 }
-
-export default Select;

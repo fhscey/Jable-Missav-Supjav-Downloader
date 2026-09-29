@@ -315,5 +315,3 @@ export function DownloadPopover({ onClose }: DownloadPopoverProps) {
     </>
   );
 }
-
-export default DownloadPopover;

@@ -47,5 +47,3 @@ export const ModalHost: React.FC = () => {
     </>
   );
 };
-
-export default ModalHost;

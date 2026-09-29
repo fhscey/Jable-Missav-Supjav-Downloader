@@ -12,7 +12,7 @@ import {
   useUpdateConfig,
 } from '../../hooks/queries';
 import { Drawer } from '../ui/Drawer';
-import { LogoIcon } from '../ui/AvLogoIcon';
+import { LogoIcon } from '../ui/LogoIcon';
 import { Button } from '../ui/Button';
 import { Toggle } from '../ui/Toggle';
 import { Select } from '../ui/Select';
@@ -170,13 +170,8 @@ function SpeedControl({
 export function SettingsDrawer({ onClose }: SettingsDrawerProps) {
   const { t } = useTranslation();
   const { data: config } = useAppConfig();
-  const {
-    updateConfig,
-    selectDir,
-    openDownloadDir,
-    resetToDefaults,
-    saveTriggerId,
-  } = useUpdateConfig();
+  const { updateConfig, selectDir, openDownloadDir, resetToDefaults, saveTriggerId } =
+    useUpdateConfig();
 
   const [deleteFileMode, setLocalDeleteFileMode] = useState<DeleteFileMode>(getDeleteFileMode());
 
@@ -218,7 +213,6 @@ export function SettingsDrawer({ onClose }: SettingsDrawerProps) {
       setIsCheckingUpdate(false);
     }
   };
-
 
   useEffect(() => {
     if (config?.proxy_mode?.type === 'Custom') {
@@ -476,7 +470,11 @@ export function SettingsDrawer({ onClose }: SettingsDrawerProps) {
             onClick={handleCheckUpdate}
           >
             <RefreshCw size={12} className={`shrink-0 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
-            <span>{isCheckingUpdate ? t('settings.items.checkUpdate.checking') : t('settings.items.checkUpdate.button')}</span>
+            <span>
+              {isCheckingUpdate
+                ? t('settings.items.checkUpdate.checking')
+                : t('settings.items.checkUpdate.button')}
+            </span>
           </Button>
         </SettingRow>
         <SettingRow label={t('settings.items.logging.label')} tip={t('settings.items.logging.tip')}>
@@ -489,5 +487,3 @@ export function SettingsDrawer({ onClose }: SettingsDrawerProps) {
     </Drawer>
   );
 }
-
-export default SettingsDrawer;

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, X } from 'lucide-react';
 import { useUpdateStore } from '../../store/updateStore';
-import { LogoIcon } from '../ui/AvLogoIcon';
+import { LogoIcon } from '../ui/LogoIcon';
 import { Button } from '../ui/Button';
 
 export const UpdateModal: React.FC = () => {
@@ -79,9 +79,7 @@ export const UpdateModal: React.FC = () => {
 
         {/* Content Body: Release Notes */}
         <div className="space-y-1.5">
-          <div className="text-section-label">
-            {t('update.changelogTitle')}
-          </div>
+          <div className="text-section-label">{t('update.changelogTitle')}</div>
           <div className="max-h-64 overflow-y-auto overscroll-contain rounded bg-white/[0.03] p-3 text-sm text-white/80 leading-relaxed whitespace-pre-wrap select-text">
             {updateInfo.changelog?.trim() || t('update.noChangelog')}
           </div>
@@ -99,18 +97,10 @@ export const UpdateModal: React.FC = () => {
           </Button>
 
           <div className="flex items-center gap-1.5">
-            <Button
-              variant="secondary"
-              size="xs"
-              onClick={remindLater}
-            >
+            <Button variant="secondary" size="xs" onClick={remindLater}>
               {t('update.remindLater')}
             </Button>
-            <Button
-              variant="primary"
-              size="xs"
-              onClick={updateNow}
-            >
+            <Button variant="primary" size="xs" onClick={updateNow}>
               <ExternalLink size={11} className="shrink-0" />
               <span>{t('update.updateNow')}</span>
             </Button>
@@ -120,5 +110,3 @@ export const UpdateModal: React.FC = () => {
     </div>
   );
 };
-
-export default UpdateModal;

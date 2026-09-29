@@ -38,5 +38,3 @@ export function Toggle({
     </label>
   );
 }
-
-export default Toggle;

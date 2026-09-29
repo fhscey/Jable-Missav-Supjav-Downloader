@@ -6,7 +6,7 @@ import { useUIStore } from '../../store/uiStore';
 import { useActiveManifest, useSiteManifests } from '../../hooks/queries';
 import { NavItem, TagGroup } from '../../types';
 import { Drawer } from '../ui/Drawer';
-import { LogoIcon } from '../ui/AvLogoIcon';
+import { LogoIcon } from '../ui/LogoIcon';
 import pkg from '../../../package.json';
 import { useUpdateStore } from '../../store/updateStore';
 
@@ -154,7 +154,8 @@ export function SiteNavDrawer({ onClose }: SiteNavDrawerProps) {
                       <button
                         key={manifest.site}
                         onClick={() => {
-                          const initialUrl = manifest.default_url || manifest.quick_links?.[0]?.url || '';
+                          const initialUrl =
+                            manifest.default_url || manifest.quick_links?.[0]?.url || '';
                           handleSelectSite(manifest.site, initialUrl);
                         }}
                         className={`flex h-14 flex-col items-center justify-center gap-0.5 px-1.5 rounded-md transition-all duration-200 relative cursor-pointer ${
@@ -232,12 +233,16 @@ export function SiteNavDrawer({ onClose }: SiteNavDrawerProps) {
                       <Tag size={12} className="text-muted" />
                       <span>{t('siteNav.taxonomyIndex')}</span>
                     </div>
-                    <span className="text-meta-sub">{t('siteNav.totalTags', { count: totalTagsCount })}</span>
+                    <span className="text-meta-sub">
+                      {t('siteNav.totalTags', { count: totalTagsCount })}
+                    </span>
                   </div>
 
                   {filteredTagGroups.length === 0 ? (
                     <div className="py-6 text-center text-meta">
-                      {searchQuery ? t('siteNav.noMatchQuery', { query: searchQuery }) : t('siteNav.noTagsData')}
+                      {searchQuery
+                        ? t('siteNav.noMatchQuery', { query: searchQuery })
+                        : t('siteNav.noTagsData')}
                     </div>
                   ) : (
                     filteredTagGroups.map((tag, index) => {

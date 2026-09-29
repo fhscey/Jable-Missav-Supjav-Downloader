@@ -89,5 +89,3 @@ export function BottomBar() {
     </footer>
   );
 }
-
-export default BottomBar;

@@ -11,10 +11,8 @@ export const buttonVariants = cva(
           'border border-active bg-white/15 text-primary hover:bg-white/25 active:scale-95 shadow-sm',
         secondary:
           'border border-default bg-white/5 text-secondary hover:border-medium hover:bg-white/10 hover:text-primary active:scale-95',
-        ghost:
-          'text-muted hover:bg-white/10 hover:text-primary active:scale-90',
-        control:
-          'btn-control',
+        ghost: 'text-muted hover:bg-white/10 hover:text-primary active:scale-90',
+        control: 'btn-control',
         danger:
           'border border-rose-500/30 bg-rose-500/20 text-rose-200 hover:bg-rose-500/30 active:scale-95',
       },
@@ -36,8 +34,7 @@ export const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   children: React.ReactNode;
 }
 
@@ -50,14 +47,8 @@ export function Button({
   ...props
 }: ButtonProps) {
   return (
-    <button
-      type={type}
-      className={cn(buttonVariants({ variant, size }), className)}
-      {...props}
-    >
+    <button type={type} className={cn(buttonVariants({ variant, size }), className)} {...props}>
       {children}
     </button>
   );
 }
-
-export default Button;

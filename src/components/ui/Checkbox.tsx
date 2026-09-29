@@ -57,5 +57,3 @@ export function Checkbox({
     </label>
   );
 }
-
-export default Checkbox;
