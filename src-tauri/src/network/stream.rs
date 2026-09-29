@@ -152,9 +152,18 @@ pub async fn handle_stream_request(
     if is_preview {
         let cached = PREVIEW_CACHE.lock().get(&target_url).cloned();
         if let Some(media) = cached {
+            log::debug!("[StreamProtocol] 命中内存切片缓存: target_url={}, range={:?}", target_url, incoming_range);
             return serve_cached_slice(&media, incoming_range);
         }
     }
+
+    log::debug!(
+        "[StreamProtocol] 发起上游请求: target_url={}, is_preview={}, is_m3u8={}, range={:?}",
+        target_url,
+        is_preview,
+        is_m3u8_url,
+        incoming_range
+    );
 
     let state = app.state::<AppState>();
     let mut req = state.http_client.read().get(&target_url);
@@ -200,6 +209,7 @@ pub async fn handle_stream_request(
     let upstream_resp = req.send().await?;
     let status_code = upstream_resp.status().as_u16();
     let upstream_headers = upstream_resp.headers().clone();
+    log::debug!("[StreamProtocol] 上游返回响应: target_url={}, status={}", target_url, status_code);
 
     // 3. 处理 M3U8 播放列表重写
     if is_m3u8_url {

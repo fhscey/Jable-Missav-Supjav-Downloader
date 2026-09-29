@@ -38,11 +38,17 @@ pub fn run() {
     tauri::Builder::default()
         .register_asynchronous_uri_scheme_protocol("stream", |ctx, request, responder| {
             let app_handle = ctx.app_handle().clone();
+            let uri = request.uri().to_string();
+            let method = request.method().clone();
+            log::debug!("[StreamProtocol] >>> 收到流媒体协议请求: method={}, uri={}", method, uri);
             tauri::async_runtime::spawn(async move {
                 let resp = match stream::handle_stream_request(app_handle, request).await {
-                    Ok(resp) => resp,
+                    Ok(resp) => {
+                        log::debug!("[StreamProtocol] <<< 响应成功: uri={}, status={}", uri, resp.status());
+                        resp
+                    }
                     Err(e) => {
-                        log::error!("[stream protocol] 处理失败: err = {}", e);
+                        log::debug!("[StreamProtocol] <<< 处理失败: uri={}, err={}", uri, e);
                         tauri::http::Response::builder()
                             .status(500)
                             .header("Content-Type", "text/plain")

@@ -5,6 +5,7 @@ import { tauriApi } from '../../api';
 import { useDownloadStore } from '../../store/downloadStore';
 import { useUIStore } from '../../store/uiStore';
 import { VideoInfo } from '../../types';
+import { logMediaError } from '../../utils/mediaDiagnostics';
 
 interface VideoCardProps {
   data: VideoInfo;
@@ -40,6 +41,7 @@ export const VideoCard = memo(function VideoCard({ data }: VideoCardProps) {
 
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     hoverTimerRef.current = setTimeout(() => {
+      console.info(`[VideoCard Preview] 悬停尝试加载预览: ID=${id}, URL=${previewStreamUrl}`);
       setVideoSrc(previewStreamUrl);
       setPlayingPreview(true);
     }, 200);
@@ -132,6 +134,13 @@ export const VideoCard = memo(function VideoCard({ data }: VideoCardProps) {
           loop
           playsInline
           className="pointer-events-none absolute inset-0 z-[2] size-full object-cover bg-[#0e1015]"
+          onPlay={() => {
+            console.info(`[VideoCard Preview] ▶ 预览播放成功: ID=${id}`);
+          }}
+          onError={(e) => {
+            const err = (e.currentTarget as HTMLVideoElement).error;
+            logMediaError(`VideoCard Preview (ID=${id})`, videoSrc, err);
+          }}
         />
       )}
 

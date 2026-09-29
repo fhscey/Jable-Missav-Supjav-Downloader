@@ -7,6 +7,10 @@ import { tauriApi } from "./api";
 import { useUIStore } from "./store/uiStore";
 import App from "./App";
 import "./App.css";
+import { runMediaDiagnostics } from "./utils/mediaDiagnostics";
+
+// 启动媒体与流协议诊断
+runMediaDiagnostics();
 
 async function bootstrap() {
   try {
