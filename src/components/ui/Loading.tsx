@@ -7,13 +7,12 @@ export interface LoadingProps {
   className?: string;
 }
 
-const DOTS_CYCLE = ['...', '..', '.'];
+const DOTS_CYCLE = ['.', '..', '...'];
 
 export const Loading: React.FC<LoadingProps> = ({ message, className = '' }) => {
   const { t } = useTranslation();
   const [dotIndex, setDotIndex] = useState(0);
 
-  // 循环动画：3个点 -> 2个点 -> 1个点 -> 3个点
   useEffect(() => {
     const timer = setInterval(() => {
       setDotIndex((prev) => (prev + 1) % DOTS_CYCLE.length);
