@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, X } from 'lucide-react';
+import { LoaderCircle, Search, X } from 'lucide-react';
 import { useSiteStore } from '../../store/siteStore';
 import { useUIStore } from '../../store/uiStore';
 
@@ -21,7 +21,10 @@ export function SearchInput({
   const searchKeyword = useSiteStore((s) => s.searchKeyword);
   const handleSearchSubmit = useSiteStore((s) => s.handleSearchSubmit);
   const exitSearch = useSiteStore((s) => s.exitSearch);
+  const isVideoLoading = useUIStore((s) => s.isVideoLoading);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isSearching = Boolean(isVideoLoading && searchKeyword);
 
   // 输入框草稿：纯组件内部局部状态，打字不触发全局 store 与 query 变更
   const [draft, setDraft] = useState(searchKeyword);
@@ -102,7 +105,11 @@ export function SearchInput({
       }`}
       onSubmit={onSubmit}
     >
-      <Search size={13} strokeWidth={1.8} className={isFocused ? 'text-primary' : 'text-muted'} />
+      {isSearching ? (
+        <LoaderCircle size={13} className="animate-spin text-primary shrink-0" />
+      ) : (
+        <Search size={13} strokeWidth={1.8} className={isFocused ? 'text-primary' : 'text-muted'} />
+      )}
       <input
         ref={inputRef}
         className="min-w-0 flex-1 bg-transparent text-sm text-primary outline-none placeholder:text-muted"

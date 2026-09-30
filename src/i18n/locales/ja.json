@@ -44,6 +44,17 @@
     "resetZoom": "ズームをリセット",
     "sliderTitle": "ズーム倍率: {{percent}}%"
   },
+  "canvas": {
+    "loading": "動画フィードを読み込み中...",
+    "loadingSite": "「{{site}}」の動画を読み込み中...",
+    "loadingSiteDesc": "プロバイダーに接続して動画情報を取得しています...",
+    "searching": "「{{keyword}}」を検索中...",
+    "searchingDesc": "検索結果を取得しています...",
+    "loadingMore": "さらに動画を読み込み中...",
+    "emptyTitle": "動画が見つかりませんでした",
+    "emptyDesc": "別のキーワードで検索するか、サイトナビから他のカテゴリを選択してください",
+    "retry": "再読み込み"
+  },
   "bottomBar": {
     "siteNav": "サイトナビ",
     "disconnect": "接続解除",

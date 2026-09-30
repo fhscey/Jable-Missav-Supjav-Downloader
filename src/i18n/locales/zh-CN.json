@@ -44,6 +44,17 @@
     "resetZoom": "重置缩放",
     "sliderTitle": "缩放比例: {{percent}}%"
   },
+  "canvas": {
+    "loading": "正在加载视频列表...",
+    "loadingSite": "正在加载「{{site}}」视频...",
+    "loadingSiteDesc": "正在连接目标站点并提取视频元数据...",
+    "searching": "正在搜索 “{{keyword}}”...",
+    "searchingDesc": "正在向解析器请求检索结果...",
+    "loadingMore": "正在加载更多视频...",
+    "emptyTitle": "未找到相关视频",
+    "emptyDesc": "尝试更换关键词或在站点导航中切换其他分类",
+    "retry": "重新加载"
+  },
   "bottomBar": {
     "siteNav": "站点导航",
     "disconnect": "断开连接",

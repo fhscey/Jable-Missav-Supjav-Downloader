@@ -40,6 +40,10 @@ export interface UIState {
   selectedCardRect: CardAnchorRect | null;
   playingMedia: MediaDetail | null;
   playingCard: VideoInfo | null;
+  isVideoLoading: boolean;
+
+  // Video feed loading action
+  setVideoLoading: (loading: boolean) => void;
 
   // Language action
   setLanguage: (language: Language) => void;
@@ -70,6 +74,9 @@ export const useUIStore = create<UIState>((set, get) => ({
   selectedCardRect: null,
   playingMedia: null,
   playingCard: null,
+  isVideoLoading: false,
+
+  setVideoLoading: (isVideoLoading: boolean) => set({ isVideoLoading }),
 
   setLanguage: (language: Language) => {
     i18n.changeLanguage(language);

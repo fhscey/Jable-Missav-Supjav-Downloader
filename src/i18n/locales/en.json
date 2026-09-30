@@ -44,6 +44,17 @@
     "resetZoom": "Reset Zoom",
     "sliderTitle": "Zoom: {{percent}}%"
   },
+  "canvas": {
+    "loading": "Loading video feed...",
+    "loadingSite": "Loading videos from {{site}}...",
+    "loadingSiteDesc": "Connecting to provider and extracting video metadata...",
+    "searching": "Searching for \"{{keyword}}\"...",
+    "searchingDesc": "Querying provider for search results...",
+    "loadingMore": "Loading more videos...",
+    "emptyTitle": "No videos found",
+    "emptyDesc": "Try a different keyword or select another category from navigation",
+    "retry": "Reload"
+  },
   "bottomBar": {
     "siteNav": "Navigation",
     "disconnect": "Disconnect",

@@ -12,6 +12,8 @@ export interface UseMediaDetailOptions {
 export interface UseMediaDetailResult {
   detail: MediaDetail | null;
   loading: boolean;
+  isLoading: boolean;
+  isFetching: boolean;
   error: string;
   refetch: () => void;
 }
@@ -35,7 +37,7 @@ export function useMediaDetail(
   // 如果已经具备有效 stream_url 的 initialData，则不需要再发起请求，除非显式 refetch
   const isEnabled = Boolean(cardKey) && (options?.enabled ?? true) && !hasStreamUrl;
 
-  const { data, isPending, error, refetch } = useQuery<MediaDetail, unknown>({
+  const { data, isPending, isFetching, error, refetch } = useQuery<MediaDetail, unknown>({
     queryKey: queryKeys.mediaDetail(cardKey, lang),
     queryFn: () => tauriApi.extractMedia(card!, { lang }),
     enabled: isEnabled,
@@ -46,10 +48,14 @@ export function useMediaDetail(
     retry: 1,
   });
 
+  // 严格准确的加载状态：启用请求且正在获取（包括首次 pending 或后续 refetch）
+  const isLoading = Boolean(isEnabled && (isPending || isFetching));
+
   return {
     detail: data ?? null,
-    // 如果已有 initialData 且包含播放源，则不视为 loading
-    loading: hasStreamUrl ? false : isPending,
+    loading: isLoading,
+    isLoading,
+    isFetching,
     error: error ? formatExtractorError(error) : '',
     refetch,
   };

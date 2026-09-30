@@ -44,6 +44,17 @@
     "resetZoom": "重設縮放",
     "sliderTitle": "縮放比例: {{percent}}%"
   },
+  "canvas": {
+    "loading": "正在載入影片清單...",
+    "loadingSite": "正在載入「{{site}}」影片...",
+    "loadingSiteDesc": "正在連接目標站點並擷取影片資訊...",
+    "searching": "正在搜尋「{{keyword}}」...",
+    "searchingDesc": "正在向解析器請求搜尋結果...",
+    "loadingMore": "正在載入更多影片...",
+    "emptyTitle": "未找到相關影片",
+    "emptyDesc": "嘗試更換關鍵字或在站點導航中切換其他分類",
+    "retry": "重新載入"
+  },
   "bottomBar": {
     "siteNav": "站點導航",
     "disconnect": "斷開連接",

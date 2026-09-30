@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { tauriApi } from '../../api';
 import { useCanvasStore } from '../../store/canvasStore';
 import { useSiteStore } from '../../store/siteStore';
@@ -70,7 +70,22 @@ export function useVideoFeed() {
   const query = useInfiniteQuery<PageResult, unknown>({
     queryKey,
     enabled: isQueryEnabled,
-    placeholderData: keepPreviousData,
+    placeholderData: (previousData, previousQuery) => {
+      const prevKey = previousQuery?.queryKey as any;
+      const currKey = queryKey as any;
+      // 只有在同一个站点且搜索词与页面路径一致（仅分页或重试）时复用已有数据；
+      // 切换站点、分类或新检索时坚决清空旧数据，触发真实的 isLoading 状态以显示 Loading 组件，杜绝黑屏困惑
+      if (
+        prevKey &&
+        currKey &&
+        prevKey[1]?.site === currKey[1]?.site &&
+        prevKey[1]?.keyword === currKey[1]?.keyword &&
+        prevKey[1]?.url === currKey[1]?.url
+      ) {
+        return previousData;
+      }
+      return undefined;
+    },
     queryFn: async ({ pageParam }) => {
       const pageIdx = pageParam as number;
       const fetchParams = {
@@ -134,11 +149,26 @@ export function useVideoFeed() {
     if (q.hasNextPage && !q.isFetchingNextPage) {
       q.fetchNextPage();
     }
-  }, []) 
+  }, []);
+
+  // 准确识别加载状态：
+  // 1. isQueryEnabled 为 true 时，初始加载 (query.isLoading)
+  // 2. 或非分页拉取的刷新/重载 (query.isFetching && !query.isFetchingNextPage)
+  const isLoading = Boolean(
+    isQueryEnabled && (query.isLoading || (query.isFetching && !query.isFetchingNextPage))
+  );
+
+  // 同步至全局 UI Store，避免各组件层层透传参数
+  useEffect(() => {
+    useUIStore.getState().setVideoLoading(isLoading);
+    return () => {
+      useUIStore.getState().setVideoLoading(false);
+    };
+  }, [isLoading]);
 
   return {
     cards,
-    fetchNexts
+    fetchNexts,
   };
 }
 

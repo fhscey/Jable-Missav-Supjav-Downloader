@@ -7,3 +7,4 @@ export * from './Drawer';
 export * from './Toast';
 export * from './Checkbox';
 export * from './DiskSpaceRing';
+export * from './Loading';
