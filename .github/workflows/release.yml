@@ -28,6 +28,10 @@ jobs:
             target: 'x86_64-pc-windows-msvc'
             args: '--bundles nsis'
             binary_name: 'avdl.exe'
+          - platform: 'windows-11-arm'
+            target: 'aarch64-pc-windows-msvc'
+            args: '--target aarch64-pc-windows-msvc --bundles nsis'
+            binary_name: 'avdl.exe'
           - platform: 'ubuntu-22.04'
             target: 'x86_64-unknown-linux-gnu'
             args: '--bundles appimage'
@@ -121,7 +125,7 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
-      # Portable binary artifacts for all three platforms
+      # Portable binary artifacts for all platforms
       - name: Upload Portable Binary
         shell: bash
         env:
@@ -161,6 +165,11 @@ jobs:
               ;;
             windows-latest)
               EXE_NAME="AVDL_${TAG}_windows_x64.exe"
+              cp "$BIN" "./${EXE_NAME}"
+              gh release upload "${TAG}" "./${EXE_NAME}" --clobber
+              ;;
+            windows-11-arm)
+              EXE_NAME="AVDL_${TAG}_windows_arm64.exe"
               cp "$BIN" "./${EXE_NAME}"
               gh release upload "${TAG}" "./${EXE_NAME}" --clobber
               ;;
